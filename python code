@@ -1,0 +1,158 @@
+class Authentication:
+    def __init__(self):
+        self.filename = "users.txt"
+
+    def register(self, username, password):
+        try:
+            file = open(self.filename, "r")
+            users = file.readlines()
+            file.close()
+        except FileNotFoundError:
+            user=[]
+
+        for user in users:
+            user = user.strip().split(",")
+            if user[0] == username:
+                print("User already exists!")
+                return
+        file = open(self.filename, "a")
+        file.write(f"{username},{password}\n")
+        file.close()
+        print("Registered successfully!")
+
+    def login(self, username, password):
+        try:
+            file = open(self.filename, "r")
+            users = file.readlines()
+            file.close()
+        except FileNotFoundError:
+            print("No users registered yet!")
+            return False
+
+        for user in users:
+            user = user.strip().split(",")
+            if user[0] == username and user[1] == password:
+                print("Login successful!")
+                return True
+        print("Invalid credentials!")
+        return False
+
+
+class Product:
+    def __init__(self, id, name, price):
+        self.id = id
+        self.name = name
+        self.price = price
+
+
+class Store:
+    def __init__(self):
+        self.products = [
+            Product(101, "iPhone", 120000),
+            Product(102, "Samsung", 100000),
+            Product(103, "Laptop", 69000),
+            Product(104, "Smart Watch", 4000)
+        ]
+        self.cart = []
+
+    def view_products(self):
+        print("\n************ Products ************")
+        for product in self.products:
+            print(f"{product.id}. {product.name} - ₹{product.price}")
+        print("**********************************")
+
+    def add_product(self):
+        product_id = int(input("Enter product id to add to cart: "))
+        for product in self.products:
+            if product.id == product_id:
+                self.cart.append(product)
+                print(f"{product.name} added to cart!")
+                return
+        print("Invalid product ID!")
+
+    def remove_product(self):
+        product_id = int(input("Enter product id to remove from cart: "))
+        for product in self.cart:
+            if product.id == product_id:
+                self.cart.remove(product)
+                print(f"{product.name} removed from cart!")
+                return
+        print("Product not found in cart!")
+
+    def view_cart(self):
+        if not self.cart:
+            print("Your cart is empty.")
+            return
+        print("\n************ Your Cart ************")
+        total = 0
+        for product in self.cart:
+            print(f"{product.id}. {product.name} - ₹{product.price}")
+            total += product.price
+        print(f"Total Amount: ₹{total}")
+        print("***********************************")
+
+    def checkout(self):
+        if not self.cart:
+            print("Cart is empty. Cannot checkout.")
+            return
+        self.view_cart()
+        confirm = input("Do you want to place the order? (y/n): ")
+        if confirm.lower() == "y":
+            print("Your order has been placed successfully!")
+            self.cart.clear()
+        else:
+            print("Checkout cancelled.")
+
+    def run(self):
+        while True:
+            print("\n--- Store Menu ---")
+            print("1) View Products")
+            print("2) Add Product to Cart")
+            print("3) Remove Product from Cart")
+            print("4) View Cart")
+            print("5) Checkout")
+            print("6) Exit")
+            option = input("Choose an option: ")
+
+            if option == "1":
+                self.view_products()
+            elif option == "2":
+                self.add_product()
+            elif option == "3":
+                self.remove_product()
+            elif option == "4":
+                self.view_cart()
+            elif option == "5":
+                self.checkout()
+            elif option == "6":
+                print("Thank you for shopping!")
+                break
+            else:
+                print("Invalid option! Try again.")
+
+
+# -------------------- MAIN --------------------
+auth = Authentication()
+print("Welcome to the E-commerce App")
+
+while True:
+    print("\n1) Register")
+    print("2) Login")
+    print("3) Exit")
+    option = input("Choose an option: ")
+
+    if option == "1":
+        username = input("Enter username: ")
+        password = input("Enter password: ")
+        auth.register(username, password)
+    elif option == "2":
+        username = input("Enter username: ")
+        password = input("Enter password: ")
+        if auth.login(username, password):
+            store = Store()
+            store.run()
+    elif option == "3":
+        print("Goodbye!")
+        break
+    else:
+        print("Invalid choice!")
